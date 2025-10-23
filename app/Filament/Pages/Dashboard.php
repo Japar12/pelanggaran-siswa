@@ -27,28 +27,27 @@ class Dashboard extends BaseDashboard
                 \App\Filament\Widgets\Admin\UsersStatsOverview::class,
                 \App\Filament\Widgets\Admin\ViolationStatsOverview::class,
                 \App\Filament\Widgets\Admin\TopStudentsTable::class,
-                \App\Filament\Widgets\Admin\StudentPointsPercentageChart::class,
             ];
         }
 
         if ($user->hasRole('guru')) {
             return [
-                \App\Filament\Widgets\GuruViolationOverview::class,
-                \App\Filament\Widgets\GuruViolationsTrendChart::class,
+                // \App\Filament\Widgets\GuruViolationOverview::class,
+                // \App\Filament\Widgets\GuruViolationsTrendChart::class,
             ];
         }
 
         if ($user->hasRole('siswa')) {
             return [
-                \App\Filament\Widgets\SiswaViolationOverview::class,
-                \App\Filament\Widgets\SiswaViolationsHistoryChart::class,
+                // \App\Filament\Widgets\SiswaViolationOverview::class,
+                // \App\Filament\Widgets\SiswaViolationsHistoryChart::class,
             ];
         }
 
         if ($user->hasRole('ortu')) {
             return [
-                \App\Filament\Widgets\OrtuViolationOverview::class,
-                \App\Filament\Widgets\AnakViolationStatusChart::class,
+                // \App\Filament\Widgets\OrtuViolationOverview::class,
+                // \App\Filament\Widgets\AnakViolationStatusChart::class,
             ];
         }
 

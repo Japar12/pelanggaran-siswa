@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Students\Pages\EditStudent;
 use App\Filament\Resources\Students\Pages\ListStudents;
 use App\Filament\Resources\Students\Pages\CreateStudent;
+use App\Filament\Resources\Students\Pages\StudentDetail;
 use App\Filament\Resources\Students\Schemas\StudentForm;
 use App\Filament\Resources\Students\Tables\StudentsTable;
 
@@ -44,7 +45,6 @@ class StudentResource extends Resource
             'index' => ListStudents::route('/'),
             'create' => CreateStudent::route('/create'),
             'edit' => EditStudent::route('/{record}/edit'),
-            'view' => Pages\ViewStudent::route('/{record}'),
         ];
     }
 

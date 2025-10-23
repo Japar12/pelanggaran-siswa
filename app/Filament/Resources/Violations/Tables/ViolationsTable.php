@@ -15,12 +15,18 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class ViolationsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+         ->modifyQueryUsing(function (Builder $query) {
+            if (request()->filled('student_id')) {
+                $query->where('student_id', request('student_id'));
+            }
+        })
             ->columns([
                 TextColumn::make('student.name')->label('Nama Siswa')->sortable()->searchable(),
                 TextColumn::make('createdBy.name')

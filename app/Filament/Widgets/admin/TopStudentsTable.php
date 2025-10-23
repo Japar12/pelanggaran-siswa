@@ -3,23 +3,24 @@
 namespace App\Filament\Widgets\Admin;
 
 use Filament\Tables;
-use Filament\Actions\Action;
 use App\Models\Student;
+use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\Students\StudentResource;
 use Filament\Widgets\TableWidget as BaseWidget;
+use App\Filament\Resources\Students\StudentResource;
+use App\Filament\Resources\Violations\ViolationResource;
 
-/**
- * Widget: Top Students
- * Versi ringan — menampilkan 10 siswa dengan poin tertinggi + persentase dari max point tetap.
- */
 class TopStudentsTable extends BaseWidget
 {
     protected static ?string $heading = 'Top 10 Siswa dengan Poin Tertinggi';
-    protected static bool $isLazy = true; // hanya render saat dibuka
+    protected static bool $isLazy = true;
 
-    // 🎯 Set nilai maksimum poin langsung di kode
-    protected int $maxPoints = 300;
+    protected int $maxPoints;
+
+    public function boot(): void
+    {
+        $this->maxPoints = (int) env('MAX_VIOLATION_POINTS', 300);
+    }
 
     public function getColumnSpan(): int|string|array
     {
@@ -28,35 +29,47 @@ class TopStudentsTable extends BaseWidget
 
     protected function getTableQuery(): Builder
     {
+         // 🎯 Hanya hitung poin dari pelanggaran yang disetujui
         return Student::select(['id', 'name', 'gender', 'class_room_id'])
             ->with(['class_room:id,name'])
-            ->withSum('violations', 'points')
+            ->withSum(
+                ['violations as violations_sum_points' => function ($query) {
+                    $query->where('status', 'approved'); // hanya approved
+                }],
+                'points'
+            )
             ->orderByDesc('violations_sum_points')
             ->limit(10);
     }
 
     protected function getTableColumns(): array
     {
-        $max = $this->maxPoints; // ambil nilai tetap
+        $max = $this->maxPoints;
 
         return [
             Tables\Columns\TextColumn::make('name')
                 ->label('Nama Siswa')
-                ->sortable()
                 ->searchable(),
 
             Tables\Columns\TextColumn::make('gender')
                 ->label('Gender')
                 ->badge()
-                ->color(fn (string $state) => $state === 'Laki-laki' ? 'info' : 'pink'),
+                ->searchable()
+                ->default('-')
+                ->color(fn (string|null $state) => match ($state) {
+                    'Laki-laki' => 'info',
+                    'Perempuan' => 'pink',
+                    default => 'gray',
+                }),
 
             Tables\Columns\TextColumn::make('class_room.name')
                 ->label('Kelas')
+                ->searchable()
                 ->default('-'),
 
             Tables\Columns\TextColumn::make('violations_sum_points')
                 ->label('Total Poin')
-                ->sortable()
+                ->default(0)
                 ->badge()
                 ->color(fn ($state) => match (true) {
                     $state >= 200 => 'danger',
@@ -67,7 +80,7 @@ class TopStudentsTable extends BaseWidget
             Tables\Columns\TextColumn::make('percentage')
                 ->label('Persentase (%)')
                 ->state(fn (Student $record) =>
-                    number_format(($record->violations_sum_points ?? 0) / $max * 100, 1)
+                    number_format((($record->violations_sum_points ?? 0) / $max) * 100, 1)
                 )
                 ->suffix('%')
                 ->color(fn ($state) => match (true) {
@@ -86,8 +99,9 @@ class TopStudentsTable extends BaseWidget
                 ->icon('heroicon-o-eye')
                 ->color('info')
                 ->url(fn (Student $record) =>
-                    StudentResource::getUrl('view', ['record' => $record])
+                    ViolationResource::getUrl('index', ['student_id' => $record->id])
                 ),
+                
         ];
     }
 }

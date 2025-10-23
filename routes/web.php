@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Student;
 use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
@@ -18,6 +19,7 @@ Route::view('dashboard', 'dashboard')
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
+
 
 
 Route::middleware(['auth'])->group(function () {
