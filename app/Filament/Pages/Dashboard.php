@@ -9,8 +9,6 @@ use Filament\Support\Icons\Heroicon;
 class Dashboard extends BaseDashboard
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Home;
-    protected static ?string $navigationLabel = 'Dashboard';
-    protected static ?string $title = 'Dashboard Pelanggaran Siswa';
     protected static bool $shouldRegisterNavigation = true;
 
     public static function canAccess(): bool
